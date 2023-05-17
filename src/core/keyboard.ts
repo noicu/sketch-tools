@@ -1,5 +1,5 @@
+import { reactive } from '../utils'
 import { EventEmitter } from './event'
-import { reactive } from './utils'
 
 export enum IKeyCode {
   Backquote = 'Backquote',

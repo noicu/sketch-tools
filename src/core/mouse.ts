@@ -1,13 +1,12 @@
 import { EventEmitter } from './event'
+import type { IVector2 } from './vector'
 
-export class SketchMouse {
+export class SketchMouse extends EventEmitter<IVector2> implements IVector2 {
   private _x = 0
   private _y = 0
   private _lastX = 0
   private _lastY = 0
   private _down = false
-
-  private _event = new EventEmitter<{ x: number; y: number }>()
 
   get x(): number {
     return this._x
@@ -58,35 +57,39 @@ export class SketchMouse {
   }
 
   constructor() {
+    super()
+    // 1
     document.onmousedown = (e) => {
       this.down = true
 
       this.lastX = e.clientX
       this.lastY = e.clientY
 
-      this._event.emit('down', this.lastPosition)
+      this.emit('down', this.lastPosition)
 
       e.preventDefault()
     }
+    // 2
+    document.onmouseup = (e) => {
+      this.down = false
+
+      this.emit('up', this.lastPosition)
+    }
+    // 3
+    document.onclick = (e) => {}
 
     document.onmousemove = (e) => {
       this.x = e.clientX
       this.y = e.clientY
-      this._event.emit('move', this.position)
+      this.emit('move', this.position)
       if (this.down) {
         this.lastX = e.clientX
         this.lastY = e.clientY
       }
     }
 
-    document.onmouseup = (e) => {
-      this.down = false
-
-      this._event.emit('up', this.lastPosition)
+    document.oncontextmenu = (e) => {
+      e.preventDefault()
     }
-  }
-
-  on(eventName: 'move', handler: (data: { x: number; y: number }) => void) {
-    this._event.on(eventName, handler)
   }
 }

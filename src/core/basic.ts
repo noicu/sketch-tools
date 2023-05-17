@@ -1,28 +1,38 @@
+import { generateUUID } from '../utils'
 import { EventEmitter } from './event'
-import { generateUUID } from './utils'
+import type { IVector2 } from './vector'
+import type { ISize } from './size'
 
 export type ISketchParent = SketchBasic | null | undefined
 
 export type ISketchBasicEvent = 'parentChange' | 'rotateChange' | 'positionChange' | 'sizeChange'
 
-export class SketchBasic {
+export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, ISize {
   readonly id: string
   readonly element: HTMLElement
-  private _width = 0
-  private _height = 0
-  private _x = 0
-  private _y = 0
   private _rotate = 0
   private _children: SketchBasic[] = []
   private _parent?: ISketchParent
-
-  private _event = new EventEmitter<SketchBasic>()
+  private _x = 0
+  private _y = 0
+  private _width = 0
+  private _height = 0
 
   type = 'basic'
   constructor(element?: HTMLElement) {
+    super()
     this.id = generateUUID()
     this.element = element || document.createElement('div')
     this.element.setAttribute('data-id', this.id)
+
+    this.element.onmouseover = (e) => {
+      this.element.style.cursor = 'move'
+      // console.log('onmouseover',this)
+    }
+
+    this.element.onmouseout = (e) => {
+      this.element.style.cursor = 'default'
+    }
   }
 
   addChild(sketch: SketchBasic): void {
@@ -62,7 +72,7 @@ export class SketchBasic {
   set width(value: number) {
     this._width = value
     this.element.style.width = `${value}px`
-    this._event.emit('sizeChange', this)
+    this.emit('sizeChange', this)
   }
 
   get height(): number {
@@ -72,7 +82,7 @@ export class SketchBasic {
   set height(value: number) {
     this._height = value
     this.element.style.height = `${value}px`
-    this._event.emit('sizeChange', this)
+    this.emit('sizeChange', this)
   }
 
   get x(): number {
@@ -83,7 +93,7 @@ export class SketchBasic {
     this._x = value
     this.element.style.transform = this.transform
 
-    this._event.emit('positionChange', this)
+    this.emit('positionChange', this)
   }
 
   get y(): number {
@@ -94,7 +104,7 @@ export class SketchBasic {
     this._y = value
     this.element.style.transform = this.transform
 
-    this._event.emit('positionChange', this)
+    this.emit('positionChange', this)
   }
 
   get rotate(): number {
@@ -104,7 +114,7 @@ export class SketchBasic {
   set rotate(value: number) {
     this._rotate = value
     this.element.style.transform = this.transform
-    this._event.emit('rotateChange', this)
+    this.emit('rotateChange', this)
   }
 
   get children(): SketchBasic[] {
@@ -117,10 +127,6 @@ export class SketchBasic {
 
   set parent(parent: ISketchParent) {
     this._parent = parent
-    this._event.emit('parentChange', this)
-  }
-
-  on(event: ISketchBasicEvent, callback: (data: SketchBasic) => void): void {
-    this._event.on(event, callback)
+    this.emit('parentChange', this)
   }
 }

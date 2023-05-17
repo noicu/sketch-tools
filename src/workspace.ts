@@ -27,7 +27,7 @@ export class SketchWorkspace extends SketchBasic {
     this.addLayer(this.worklayer)
 
     this.mouse.on('move', (mEvent) => {
-      if (this.mouse.down && this.keyboard.isPressed('Space')) {
+      if (this.mouse.down) {
         const dx = mEvent.x - this.mouse.lastX
         const dy = mEvent.y - this.mouse.lastY
 
@@ -37,11 +37,11 @@ export class SketchWorkspace extends SketchBasic {
     })
 
     this.keyboard.on('keydown', (kEvent) => {
-      console.log('keydown', kEvent.keys)
+      // console.log('keydown', kEvent.keys)
     })
 
     this.keyboard.on('keyup', (kEvent) => {
-      console.log('keyup', kEvent.keys)
+      // console.log('keyup', kEvent.keys)
     })
   }
 
