@@ -1,18 +1,18 @@
 {
-  "name": "pkg-name",
+  "name": "sketch-tools",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "packageManager": "pnpm@8.1.1",
   "description": "",
   "author": "Noicu <ycxgzs@gmail.com>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/nociu",
-  "homepage": "https://github.com/nociu/pkg-name#readme",
+  "homepage": "https://github.com/nociu/sketch-tools#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nociu/pkg-name.git"
+    "url": "git+https://github.com/nociu/sketch-tools.git"
   },
-  "bugs": "https://github.com/nociu/pkg-name/issues",
+  "bugs": "https://github.com/nociu/sketch-tools/issues",
   "keywords": [],
   "sideEffects": false,
   "exports": {
@@ -39,6 +39,7 @@
   "scripts": {
     "build": "unbuild",
     "dev": "unbuild --stub",
+    "playground": "cd playground && pnpm dev",
     "lint": "eslint .",
     "prepublishOnly": "nr build",
     "release": "bumpp && npm publish",

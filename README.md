@@ -1,14 +1,29 @@
-# pkg-name
+# sketch-tools
 
-[![NPM version](https://img.shields.io/npm/v/pkg-name?color=a1b858&label=)](https://www.npmjs.com/package/pkg-name)
+> A collection of tools for Sketch
 
-## Sponsors
+## Install
 
-<p align="center">
-  <a href="https://cdn.jsdelivr.net/gh/nociu/static/sponsors.svg">
-    <img src='https://cdn.jsdelivr.net/gh/nociu/static/sponsors.svg'/>
-  </a>
-</p>
+```sh
+npm install sketch-tools
+```
+
+## Usage
+
+```js
+import { getDocument } from 'sketch-tools'
+
+const document = getDocument()
+```
+
+## 目标
+- [] 操作层
+  - [] 选中层
+  - [] 参考层
+- [] 选中块
+- [] 拖动块
+- [] 旋转块
+- [] 缩放块
 
 ## License
 
