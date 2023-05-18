@@ -1,11 +1,11 @@
-import type { SketchLayer } from './core/layer'
-import { SketchBasic } from './core/basic'
-import { BlockLayer } from './layer/blockLayer'
-import { SketchMouse } from './core/mouse'
-import { SketchKeyboard } from './core/keyboard'
+import { WorkLayer } from '../layer/workLayer'
+import type { SketchLayer } from './layer'
+import { SketchBasic } from './basic'
+import { SketchMouse } from './mouse'
+import { SketchKeyboard } from './keyboard'
 
 export class SketchWorkspace extends SketchBasic {
-  worklayer = new BlockLayer()
+  worklayer: WorkLayer
   layers: SketchLayer[] = []
   mouse = new SketchMouse()
   keyboard = new SketchKeyboard()
@@ -13,42 +13,30 @@ export class SketchWorkspace extends SketchBasic {
   type = 'workspace'
   constructor(element: HTMLElement | string) {
     super()
+
+    this.worklayer = new WorkLayer(this)
     if (typeof element === 'string')
       element = document.querySelector(element) as HTMLElement
+
     element.appendChild(this.element)
 
     this.element.className = 'sketch-workspace'
-
     this.width = element.clientWidth
     this.height = element.clientHeight
     this.element.style.position = 'relative'
     this.element.style.background = '#202124'
 
     this.addLayer(this.worklayer)
-
-    this.mouse.on('move', (mEvent) => {
-      if (this.mouse.down) {
-        const dx = mEvent.x - this.mouse.lastX
-        const dy = mEvent.y - this.mouse.lastY
-
-        this.worklayer.x += dx
-        this.worklayer.y += dy
-      }
-    })
-
-    this.keyboard.on('keydown', (kEvent) => {
-      // console.log('keydown', kEvent.keys)
-    })
-
-    this.keyboard.on('keyup', (kEvent) => {
-      // console.log('keyup', kEvent.keys)
-    })
   }
 
-  addLayer(layer: SketchLayer): void {
-    this.layers.push(layer)
+  addLayer(layer: SketchLayer, index?: number): void {
+    layer.context = this
+    if (index !== undefined)
+      this.layers.splice(index, 0, layer)
+    else
+      this.layers.push(layer)
     this.addChild(layer)
-    this.updateZIndex()
+    // this.updateZIndex()
   }
 
   removeLayer(layer: SketchLayer): void {
@@ -56,7 +44,7 @@ export class SketchWorkspace extends SketchBasic {
     if (index > -1)
       this.layers.splice(index, 1)
     this.removeChild(layer)
-    this.updateZIndex()
+    // this.updateZIndex()
   }
 
   updateZIndex(): void {

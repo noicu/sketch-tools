@@ -17,6 +17,14 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
   private _y = 0
   private _width = 0
   private _height = 0
+  private _name = ''
+
+  readonly polygon: IVector2[] = [
+    { x: 0, y: 0 },
+    { x: 0, y: 0 },
+    { x: 0, y: 0 },
+    { x: 0, y: 0 },
+  ]
 
   type = 'basic'
   constructor(element?: HTMLElement) {
@@ -25,14 +33,25 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
     this.element = element || document.createElement('div')
     this.element.setAttribute('data-id', this.id)
 
-    this.element.onmouseover = (e) => {
-      this.element.style.cursor = 'move'
-      // console.log('onmouseover',this)
-    }
+    // this.element.onmouseover = (e) => {
+    //   this.element.style.border = '1px solid #fff'
+    // }
 
-    this.element.onmouseout = (e) => {
-      this.element.style.cursor = 'default'
-    }
+    // this.element.onmouseout = (e) => {
+    //   this.element.style.border = 'none'
+    // }
+
+    this.on('parentChange', () => {
+      this.updatePolygon()
+    })
+
+    this.on('rotateChange', () => {
+      this.updatePolygon()
+    })
+
+    this.on('positionChange', () => {
+      this.updatePolygon()
+    })
   }
 
   addChild(sketch: SketchBasic): void {
@@ -49,6 +68,42 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
       this._children.splice(index, 1)
   }
 
+  removeChildAll(): void {
+    this._children.forEach((child) => {
+      this.removeChild(child)
+    })
+  }
+
+  removeChildAt(index: number): void {
+    this.element.removeChild(this._children[index].element)
+    this._children[index].parent = null
+    this._children.splice(index, 1)
+  }
+
+  removeChildById(id: string): void {
+    const index = this._children.findIndex(child => child.id === id)
+    if (index > -1)
+      this.removeChildAt(index)
+  }
+
+  removeChildByName(name: string): void {
+    const index = this._children.findIndex(child => child.name === name)
+    if (index > -1)
+      this.removeChildAt(index)
+  }
+
+  getChildAt(index: number): SketchBasic {
+    return this._children[index]
+  }
+
+  getChildById(id: string): SketchBasic | undefined {
+    return this._children.find(child => child.id === id)
+  }
+
+  getChildByName(name: string): SketchBasic | undefined {
+    return this._children.find(child => child.name === name)
+  }
+
   insertChild(sketch: SketchBasic, index: number): void {
     this.element.insertBefore(sketch.element, this._children[index].element)
     this._children.splice(index, 0, sketch)
@@ -59,6 +114,26 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
     this.element.replaceChild(sketch.element, this._children[index].element)
     this._children.splice(index, 1, sketch)
     this.parent = this
+  }
+
+  updatePolygon(): void {
+    const { x, y, width, height } = this
+    this.polygon[0].x = x
+    this.polygon[0].y = y
+    this.polygon[1].x = x + width
+    this.polygon[1].y = y
+    this.polygon[2].x = x + width
+    this.polygon[2].y = y + height
+    this.polygon[3].x = x
+    this.polygon[3].y = y + height
+  }
+
+  get name(): string {
+    return this._name
+  }
+
+  set name(value: string) {
+    this._name = value
   }
 
   get transform(): string {
@@ -103,7 +178,6 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
   set y(value: number) {
     this._y = value
     this.element.style.transform = this.transform
-
     this.emit('positionChange', this)
   }
 

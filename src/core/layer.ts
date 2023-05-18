@@ -1,10 +1,13 @@
 import { SketchBasic } from './basic'
+import type { SketchWorkspace } from './workspace'
 
 export class SketchLayer extends SketchBasic {
   type = 'layer'
   private _zIndex?: number
-  constructor() {
+  context: SketchWorkspace
+  constructor(context: SketchWorkspace) {
     super()
+    this.context = context
     this.element.style.position = 'absolute'
     this.x = 0
     this.y = 0

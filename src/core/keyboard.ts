@@ -69,9 +69,7 @@ export type IKeyCodeType = IKeyCode | keyof typeof IKeyCode
 
 export type ISketchKeyboardEvent = 'ctrlKey' | 'altKey' | 'shiftKey' | IKeyCodeType | 'keydown' | 'keyup' | 'key'
 
-export class SketchKeyboard {
-  private _event = new EventEmitter<SketchKeyboard>()
-
+export class SketchKeyboard extends EventEmitter<SketchKeyboard> {
   private _ctrlKey = false
   private _altKey = false
   private _shiftKey = false
@@ -91,7 +89,7 @@ export class SketchKeyboard {
   set ctrl(value) {
     if (this._ctrlKey !== value) {
       this._ctrlKey = value
-      this._event.emit('ctrlKey', this)
+      this.emit('ctrlKey', this)
     }
   }
 
@@ -102,7 +100,7 @@ export class SketchKeyboard {
   set alt(value) {
     if (this._altKey !== value) {
       this._altKey = value
-      this._event.emit('altKey', this)
+      this.emit('altKey', this)
     }
   }
 
@@ -113,7 +111,7 @@ export class SketchKeyboard {
   set shift(value) {
     if (this._shiftKey !== value) {
       this._shiftKey = value
-      this._event.emit('shiftKey', this)
+      this.emit('shiftKey', this)
     }
   }
 
@@ -124,35 +122,33 @@ export class SketchKeyboard {
   set meta(value) {
     if (this._metaKey !== value) {
       this._metaKey = value
-      this._event.emit('metaKey', this)
+      this.emit('metaKey', this)
     }
   }
 
   constructor() {
-    document.addEventListener('keydown', (event) => {
+    super()
+    document.onkeydown = (event) => {
       this._keyEvent(event)
-      this._event.emit('keydown', this)
-    })
+      this.emit('keydown', this)
+    }
 
-    document.addEventListener('keyup', (event) => {
-      this._keyEvent(event)
-      this._event.emit('keyup', this)
-    })
+    document.onkeyup = (event) => {
+      this._keyEvent(event, false)
+      this.emit('keyup', this)
+    }
   }
 
-  private _keyEvent(event: KeyboardEvent) {
+  private _keyEvent(event: KeyboardEvent, down = true) {
     this.ctrl = event.ctrlKey
     this.alt = event.altKey
     this.shift = event.shiftKey
     this.meta = event.metaKey
     this._keys[event.code as IKeyCodeType] = event.type === 'keydown'
+    this.emit(event.code + (down ? 'Down' : 'Up'), this)
   }
 
   isPressed(key: IKeyCodeType) {
     return this._keys[key]
-  }
-
-  on(eventName: ISketchKeyboardEvent, handler: (event: SketchKeyboard) => void) {
-    this._event.on(eventName, handler)
   }
 }

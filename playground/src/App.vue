@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { BlockLayer, SelectLayer, SketchBlock, SketchWorkspace } from 'sketch-tools'
+import { HoverLater, SelectLayer, SketchBlock, SketchWorkspace } from 'sketch-tools'
 
 const wpRef = ref<HTMLElement | null>(null)
 
@@ -9,20 +9,29 @@ onMounted(() => {
   const wp = new SketchWorkspace(wpRef.value as HTMLElement)
 
   const b1 = new SketchBlock()
+  const b2 = new SketchBlock()
 
-  const l1 = new BlockLayer()
-  const l2 = new SelectLayer()
+  const l1 = new HoverLater(wp)
+  const l2 = new SelectLayer(wp)
 
   wp.addLayer(l1)
   wp.addLayer(l2)
 
-  b1.width = 100
-  b1.height = 100
+  b1.width = 500
+  b1.height = 400
   b1.x = 100
   b1.y = 100
-  b1.element.style.backgroundColor = 'red'
+  b1.element.style.backgroundColor = '#5e5e5e'
+  b1.element.style.boxShadow = '0px 0px 5px #000'
+
+  b2.width = 500
+  b2.height = 400
+  b2.x = 200
+  b2.y = 200
+  b2.element.style.backgroundColor = '#5e5e5e'
 
   wp.worklayer.addChild(b1)
+  wp.worklayer.addChild(b2)
 
   console.log(wp, b1)
 })
