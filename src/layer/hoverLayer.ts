@@ -28,8 +28,8 @@ export class HoverLater extends SketchLayer {
           if (!this.getChildByName(detect.sketch.id)) {
             const sketch = new SketchBlock()
             sketch.name = detect.sketch.id
-            sketch.x = detect.sketch.x - 1
-            sketch.y = detect.sketch.y - 1
+            sketch.x = detect.sketch.x + detect.sketch.offset.x - 1
+            sketch.y = detect.sketch.y + detect.sketch.offset.y - 1
             sketch.width = detect.sketch.width + 2
             sketch.height = detect.sketch.height + 2
             sketch.element.style.cursor = 'pointer'

@@ -69,12 +69,14 @@ export class SketchMouse extends EventEmitter<SketchMouse> implements IVector2 {
 
       e.preventDefault()
     }
+
     // 2
     document.onmouseup = (e) => {
       this.down = false
 
       this.emit('up', this)
     }
+
     // 3
     document.onclick = (e) => {}
 
@@ -90,10 +92,6 @@ export class SketchMouse extends EventEmitter<SketchMouse> implements IVector2 {
 
     document.oncontextmenu = (e) => {
       e.preventDefault()
-    }
-
-    document.onwheel = (e) => {
-      this.emit('wheel', this)
     }
   }
 }

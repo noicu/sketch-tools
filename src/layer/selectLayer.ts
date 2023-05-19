@@ -27,16 +27,29 @@ export class SelectLayer extends SketchLayer {
     // 未释放鼠标
 
     this.context.mouse.on('down', (mEvent) => {
-      this._selected = {}
+      // this._selected = {}
 
       this.lastX = mEvent.x
       this.lastY = mEvent.y
 
       // 点选
-      this._pointInPolygon({
+      const collisions = this._pointInPolygon({
         x: this.lastX,
         y: this.lastY,
       }, this.context.worklayer.children)
+
+      Object.values(this._selected).forEach((detect) => {
+        detect.select = false
+      })
+
+      const collision = collisions[collisions.length - 1]
+
+      if (collision) {
+        this._selected[collision.id] = {
+          select: true,
+          sketch: collision,
+        }
+      }
 
       this.updateSelect()
     })
@@ -92,13 +105,13 @@ export class SelectLayer extends SketchLayer {
         if (!this.getChildByName(detect.sketch.id)) {
           const sketch = new SketchBlock()
           sketch.name = detect.sketch.id
-          sketch.x = detect.sketch.x - 1
-          sketch.y = detect.sketch.y - 1
+          sketch.x = detect.sketch.x + detect.sketch.offset.x - 1
+          sketch.y = detect.sketch.y + detect.sketch.offset.y - 1
           sketch.width = detect.sketch.width + 2
           sketch.height = detect.sketch.height + 2
           sketch.element.style.cursor = 'pointer'
           sketch.element.style.boxSizing = 'border-box'
-          sketch.element.style.border = '1px solid white'
+          sketch.element.style.border = '2px solid #009688'
           this.addChild(sketch)
         }
       }
@@ -135,21 +148,11 @@ export class SelectLayer extends SketchLayer {
   private _pointInPolygon(point: IVector2, children: SketchBasic[]) {
     const collisions: SketchBasic[] = []
     for (const child of children) {
-      if (isPointInPolygon(point, child.polygon)) {
+      if (isPointInPolygon(point, child.polygon))
         collisions.push(child)
-        this._selected[child.id] = {
-          select: true,
-          sketch: child,
-        }
-      }
 
-      else {
+      else
         collisions.push(...this._pointInPolygon(point, child.children))
-        this._selected[child.id] = {
-          select: false,
-          sketch: child,
-        }
-      }
     }
     return collisions
   }

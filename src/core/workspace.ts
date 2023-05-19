@@ -25,7 +25,7 @@ export class SketchWorkspace extends SketchBasic {
     this.height = element.clientHeight
     this.element.style.position = 'relative'
     this.element.style.background = '#202124'
-
+    this.element.style.overflow = 'hidden'
     this.addLayer(this.worklayer)
   }
 

@@ -18,6 +18,9 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
   private _width = 0
   private _height = 0
   private _name = ''
+  private _scale = 1
+
+  offset: IVector2 = { x: 0, y: 0 }
 
   readonly polygon: IVector2[] = [
     { x: 0, y: 0 },
@@ -42,14 +45,17 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
     // }
 
     this.on('parentChange', () => {
+      this.updateOffset()
       this.updatePolygon()
     })
 
     this.on('rotateChange', () => {
+      this.updateOffset()
       this.updatePolygon()
     })
 
     this.on('positionChange', () => {
+      this.updateOffset()
       this.updatePolygon()
     })
   }
@@ -118,14 +124,34 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
 
   updatePolygon(): void {
     const { x, y, width, height } = this
-    this.polygon[0].x = x
-    this.polygon[0].y = y
-    this.polygon[1].x = x + width
-    this.polygon[1].y = y
-    this.polygon[2].x = x + width
-    this.polygon[2].y = y + height
-    this.polygon[3].x = x
-    this.polygon[3].y = y + height
+    const ox = x + this.offset.x
+    const oy = y + this.offset.y
+    this.polygon[0].x = ox
+    this.polygon[0].y = oy
+    this.polygon[1].x = ox + width
+    this.polygon[1].y = oy
+    this.polygon[2].x = ox + width
+    this.polygon[2].y = oy + height
+    this.polygon[3].x = ox
+    this.polygon[3].y = oy + height
+  }
+
+  updateOffset(): void {
+    this.children.forEach((child) => {
+      child.offset.x = this.x + this.offset.x
+      child.offset.y = this.y + this.offset.y
+      child.updateOffset()
+      child.updatePolygon()
+    })
+  }
+
+  get scale(): number {
+    return this._scale
+  }
+
+  set scale(value: number) {
+    this._scale = value
+    this.element.style.transform = this.transform
   }
 
   get name(): string {
@@ -137,7 +163,7 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
   }
 
   get transform(): string {
-    return `translate(${this._x}px, ${this._y}px) rotate(${this._rotate}deg)`
+    return `translate(${this._x}px, ${this._y}px) rotate(${this._rotate}deg ) scale(${this._scale})`
   }
 
   get width(): number {
@@ -167,7 +193,6 @@ export class SketchBasic extends EventEmitter<SketchBasic> implements IVector2, 
   set x(value: number) {
     this._x = value
     this.element.style.transform = this.transform
-
     this.emit('positionChange', this)
   }
 
