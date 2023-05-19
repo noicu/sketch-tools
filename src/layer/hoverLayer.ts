@@ -23,26 +23,38 @@ export class HoverLater extends SketchLayer {
         x: mEvent.x,
         y: mEvent.y,
       }, this.context.worklayer.children)
-      Object.values(this._detects).forEach((detect) => {
-        if (detect.hover) {
-          if (!this.getChildByName(detect.sketch.id)) {
-            const sketch = new SketchBlock()
-            sketch.name = detect.sketch.id
-            sketch.x = detect.sketch.x + detect.sketch.offset.x - 1
-            sketch.y = detect.sketch.y + detect.sketch.offset.y - 1
-            sketch.width = detect.sketch.width + 2
-            sketch.height = detect.sketch.height + 2
-            sketch.element.style.cursor = 'pointer'
-            sketch.element.style.boxSizing = 'border-box'
-            sketch.element.style.border = '1px solid white'
-            this.addChild(sketch)
-          }
-        }
 
-        else {
-          this.removeChildByName(detect.sketch.id)
+      this.update()
+    })
+  }
+
+  update() {
+    Object.values(this._detects).forEach((detect) => {
+      if (detect.hover) {
+        const sketch = this.getChildByName(detect.sketch.id)
+        if (!sketch) {
+          const sketch = new SketchBlock()
+          sketch.name = detect.sketch.id
+          sketch.x = detect.sketch.x + detect.sketch.offset.x - 1
+          sketch.y = detect.sketch.y + detect.sketch.offset.y - 1
+          sketch.width = detect.sketch.width + 2
+          sketch.height = detect.sketch.height + 2
+          sketch.element.style.cursor = 'pointer'
+          sketch.element.style.boxSizing = 'border-box'
+          sketch.element.style.border = '1px solid white'
+          this.addChild(sketch)
         }
-      })
+        else {
+          sketch.x = detect.sketch.x + detect.sketch.offset.x - 1
+          sketch.y = detect.sketch.y + detect.sketch.offset.y - 1
+          sketch.width = detect.sketch.width + 2
+          sketch.height = detect.sketch.height + 2
+        }
+      }
+
+      else {
+        this.removeChildByName(detect.sketch.id)
+      }
     })
   }
 

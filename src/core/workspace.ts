@@ -7,14 +7,17 @@ import { SketchKeyboard } from './keyboard'
 export class SketchWorkspace extends SketchBasic {
   worklayer: WorkLayer
   layers: SketchLayer[] = []
-  mouse = new SketchMouse()
+  mouse: SketchMouse
   keyboard = new SketchKeyboard()
+
+  private _selected: SketchBasic[] = []
 
   type = 'workspace'
   constructor(element: HTMLElement | string) {
     super()
-
+    this.mouse = new SketchMouse(this)
     this.worklayer = new WorkLayer(this)
+
     if (typeof element === 'string')
       element = document.querySelector(element) as HTMLElement
 
@@ -27,6 +30,14 @@ export class SketchWorkspace extends SketchBasic {
     this.element.style.background = '#202124'
     this.element.style.overflow = 'hidden'
     this.addLayer(this.worklayer)
+  }
+
+  get selected(): SketchBasic[] {
+    return this._selected
+  }
+
+  set selected(sketches: SketchBasic[]) {
+    this._selected = sketches
   }
 
   addLayer(layer: SketchLayer, index?: number): void {

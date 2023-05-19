@@ -1,6 +1,7 @@
 import type { IVector2 } from '../core'
 import { SketchBlock } from '../core'
 import type { SketchBasic } from '../core/basic'
+import { SketchControl } from '../core/control'
 import { SketchLayer } from '../core/layer'
 import type { SketchWorkspace } from '../core/workspace'
 import { detectCollision, isPointInPolygon } from '../utils/detect'
@@ -44,10 +45,14 @@ export class SelectLayer extends SketchLayer {
 
       const collision = collisions[collisions.length - 1]
 
+      // console.log(collision)
+
       if (collision) {
-        this._selected[collision.id] = {
-          select: true,
-          sketch: collision,
+        if (!this._selected[collision.id] || !this._selected[collision.id].select) {
+          this._selected[collision.id] = {
+            select: true,
+            sketch: collision,
+          }
         }
       }
 
@@ -78,9 +83,9 @@ export class SelectLayer extends SketchLayer {
 
           // 框选
           this._detectCollisions(this.selectSketch, this.context.worklayer.children)
-          this.updateSelect()
         }
       }
+      this.updateSelect()
     })
 
     this.context.keyboard.on('ControlLeftUp', () => {
@@ -100,26 +105,26 @@ export class SelectLayer extends SketchLayer {
 
   // 更新选中框
   updateSelect() {
+    const selected: SketchBasic[] = []
     Object.values(this._selected).forEach((detect) => {
       if (detect.select) {
-        if (!this.getChildByName(detect.sketch.id)) {
-          const sketch = new SketchBlock()
-          sketch.name = detect.sketch.id
-          sketch.x = detect.sketch.x + detect.sketch.offset.x - 1
-          sketch.y = detect.sketch.y + detect.sketch.offset.y - 1
-          sketch.width = detect.sketch.width + 2
-          sketch.height = detect.sketch.height + 2
-          sketch.element.style.cursor = 'pointer'
-          sketch.element.style.boxSizing = 'border-box'
-          sketch.element.style.border = '2px solid #009688'
+        const sketch = this.getChildByName(detect.sketch.id) as SketchControl
+        if (!sketch) {
+          const sketch = new SketchControl(detect.sketch)
           this.addChild(sketch)
         }
+        else {
+          sketch.update()
+        }
+        selected.push(detect.sketch)
       }
 
       else {
         this.removeChildByName(detect.sketch.id)
       }
     })
+
+    this.context.selected = selected
   }
 
   // 递归遍历所有子元素，返回所有范围里包含点的元素

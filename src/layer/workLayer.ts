@@ -11,11 +11,22 @@ export class WorkLayer extends SketchLayer {
 
     this.context.mouse.on('move', (mEvent) => {
       if (this.context.mouse.down && this.context.keyboard.keys.length === 0) {
-        const dx = mEvent.x - mEvent.lastX
-        const dy = mEvent.y - mEvent.lastY
+        if (this.context.selected.length) {
+          const dx = mEvent.x - mEvent.lastX
+          const dy = mEvent.y - mEvent.lastY
 
-        this.x += dx
-        this.y += dy
+          this.context.selected.forEach((sketch) => {
+            sketch.x += dx
+            sketch.y += dy
+          })
+        }
+        else {
+          const dx = mEvent.x - mEvent.lastX
+          const dy = mEvent.y - mEvent.lastY
+
+          this.x += dx
+          this.y += dy
+        }
       }
     })
 

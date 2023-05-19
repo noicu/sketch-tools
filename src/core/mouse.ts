@@ -1,3 +1,4 @@
+import type { SketchBasic } from './basic'
 import { EventEmitter } from './event'
 import type { IVector2 } from './vector'
 
@@ -56,10 +57,11 @@ export class SketchMouse extends EventEmitter<SketchMouse> implements IVector2 {
     this._down = value
   }
 
-  constructor() {
+  constructor(sketch?: SketchBasic) {
+    const element = sketch?.element || document
     super()
     // 1
-    document.onmousedown = (e) => {
+    element.onmousedown = (e) => {
       this.down = true
 
       this.lastX = e.clientX
@@ -78,7 +80,7 @@ export class SketchMouse extends EventEmitter<SketchMouse> implements IVector2 {
     }
 
     // 3
-    document.onclick = (e) => {}
+    element.onclick = (e) => {}
 
     document.onmousemove = (e) => {
       this.x = e.clientX
@@ -90,7 +92,7 @@ export class SketchMouse extends EventEmitter<SketchMouse> implements IVector2 {
       }
     }
 
-    document.oncontextmenu = (e) => {
+    element.oncontextmenu = (e) => {
       e.preventDefault()
     }
   }
